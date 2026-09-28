@@ -17,7 +17,7 @@ export const ALOJAMIENTO = {
   codigoPostal: "05635",
   direccion: "Camino de la Casuca, 4, 05635 Piedracorva (Ávila)",
   geo: { lat: 40.2667, lng: -5.15 },
-  dominio: "https://lacasucademio.es",
+  dominio: "https://lacasucademio.vercel.app",
   moneda: "EUR",
   zonaHoraria: "Europe/Madrid",
   checkIn: "16:00",

@@ -28,13 +28,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Solo unas pocas URLs de ejemplo de /disponibilidad (próximos fines de
   // semana): el resto de combinaciones de fechas son válidas y navegables,
   // pero no tiene sentido listarlas todas en el sitemap.
+  //
+  // Next no escapa el `&` del query string al serializar el XML del
+  // sitemap, así que hay que hacerlo a mano (si no, el `&` sin escapar deja
+  // el XML inválido: "EntityRef: expecting ';'").
   const urlsDisponibilidad: MetadataRoute.Sitemap = proximosFinesDeSemana(8).map(
-    ({ entrada, salida }) => ({
-      url: `${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?entrada=${entrada}&salida=${salida}&adultos=2`,
-      lastModified: ahora,
-      changeFrequency: "daily",
-      priority: 0.6,
-    })
+    ({ entrada, salida }) => {
+      const query = new URLSearchParams({ entrada, salida, adultos: "2" }).toString();
+      return {
+        url: `${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?${query}`.replace(/&/g, "&amp;"),
+        lastModified: ahora,
+        changeFrequency: "daily",
+        priority: 0.6,
+      };
+    }
   );
 
   return [...urlsFijas, ...urlsDisponibilidad];

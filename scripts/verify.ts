@@ -11,7 +11,7 @@
  * respuestas HTTP reales de las tres superficies, no la lógica interna.
  */
 
-const SITE_URL = process.env.SITE_URL ?? "https://lacasucademio.es";
+const SITE_URL = process.env.SITE_URL ?? "https://lacasucademio.vercel.app";
 const SLUG = "casuca-mio"; // debe coincidir con ALOJAMIENTO.slug en lib/config.ts
 const TOLERANCIA_EUROS = 0.01;
 

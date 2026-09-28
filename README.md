@@ -34,8 +34,8 @@ convenciones del repo. Completadas: Fases 1-5.
   ```
 - Verificación rápida (HTML crudo, sin JS):
   ```bash
-  curl -s https://lacasucademio.es/alojamientos/casuca-mio | grep LodgingBusiness
-  curl -s "https://lacasucademio.es/alojamientos/casuca-mio/disponibilidad?entrada=2026-11-06&salida=2026-11-08&adultos=2" | grep -E "makesOffer|€"
+  curl -s https://lacasucademio.vercel.app/alojamientos/casuca-mio | grep LodgingBusiness
+  curl -s "https://lacasucademio.vercel.app/alojamientos/casuca-mio/disponibilidad?entrada=2026-11-06&salida=2026-11-08&adultos=2" | grep -E "makesOffer|€"
   ```
 
 ## Observabilidad de bots (Fase 4)
@@ -72,14 +72,14 @@ cualquier otra petición, porque pasan por `proxy.ts` como cualquier ruta.
 ### Añadirlo como conector en Claude
 
 En claude.ai (o Claude Desktop): **Ajustes → Conectores → Añadir conector
-personalizado**, y pega la URL `https://lacasucademio.es/api/mcp`
+personalizado**, y pega la URL `https://lacasucademio.vercel.app/api/mcp`
 (o `http://localhost:3000/api/mcp` en local).
 
 ### Añadirlo en el modo desarrollador de ChatGPT
 
 En ChatGPT: **Ajustes → Conectores → Avanzado → Modo desarrollador**
 (actívalo si no lo está) → **Añadir conector** → introduce la URL
-`https://lacasucademio.es/api/mcp` como servidor MCP remoto (Streamable HTTP).
+`https://lacasucademio.vercel.app/api/mcp` como servidor MCP remoto (Streamable HTTP).
 
 ### Verificar que web, API y MCP coinciden
 
@@ -95,25 +95,31 @@ la herramienta MCP `buscar_disponibilidad`.
 
 ## Despliegue en Vercel
 
+> Desplegado en `https://lacasucademio.vercel.app`. Si más adelante se
+> registra el dominio `lacasucademio.es` de verdad, hay que: (1) añadirlo en
+> Vercel → Settings → Domains y apuntar el DNS, y (2) cambiar
+> `ALOJAMIENTO.dominio` en `lib/config.ts` a la URL nueva (de ahí salen el
+> sitemap, el JSON-LD, el canonical y `robots.txt`).
+
 1. Importa el repo en Vercel (framework autodetectado: Next.js).
 2. Configura las variables de entorno de la tabla de abajo en el proyecto
    (Settings → Environment Variables). Ninguna es obligatoria para que el
    sitio público funcione.
 3. Despliega. Después de cada despliegue a producción, notifica a IndexNow:
-   `SITE_URL=https://lacasucademio.es npm run indexnow`.
+   `SITE_URL=https://lacasucademio.vercel.app npm run indexnow`.
 4. Verifica con `npm run verify` (o `curl`) que la web, la API y el MCP
    responden con normalidad en producción.
 
 ## Checklist de indexación
 
-- [ ] **Google Search Console**: añadir la propiedad `lacasucademio.es`,
-      verificar dominio, enviar `https://lacasucademio.es/sitemap.xml`.
+- [ ] **Google Search Console**: añadir la propiedad `lacasucademio.vercel.app`,
+      verificar dominio, enviar `https://lacasucademio.vercel.app/sitemap.xml`.
 - [ ] **Bing Webmaster Tools**: añadir el sitio (puede importarse directamente
       desde Google Search Console) y enviar el mismo sitemap.
 - [ ] **IndexNow**: confirmar que `public/af0f14317438902df7cf79363563a86c.txt`
-      es accesible en `https://lacasucademio.es/af0f14317438902df7cf79363563a86c.txt`
+      es accesible en `https://lacasucademio.vercel.app/af0f14317438902df7cf79363563a86c.txt`
       y lanzar `npm run indexnow` tras el primer despliegue.
-- [ ] Comprobar `https://lacasucademio.es/robots.txt` y `/llms.txt` en
+- [ ] Comprobar `https://lacasucademio.vercel.app/robots.txt` y `/llms.txt` en
       producción (deben servir contenido real, no un 404).
 - [ ] Registrar `/api/mcp` como conector en Claude y en el modo desarrollador
       de ChatGPT (ver arriba) para la demo en directo.
@@ -121,7 +127,7 @@ la herramienta MCP `buscar_disponibilidad`.
 ## Batería de preguntas de prueba
 
 Para probar con ChatGPT, Claude, Gemini o Perplexity (dales la URL de la ficha,
-`https://lacasucademio.es/alojamientos/casuca-mio`, o simplemente el nombre
+`https://lacasucademio.vercel.app/alojamientos/casuca-mio`, o simplemente el nombre
 "La Casuca de Mio" si el buscador del agente ya la ha indexado):
 
 1. "¿Qué disponibilidad tiene La Casuca de Mio el próximo fin de semana para 2 adultos?"

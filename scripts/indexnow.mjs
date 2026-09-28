@@ -12,7 +12,7 @@
  * pasarla por variable de entorno).
  */
 
-const SITE_URL = process.env.SITE_URL ?? "https://lacasucademio.es";
+const SITE_URL = process.env.SITE_URL ?? "https://lacasucademio.vercel.app";
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY ?? "af0f14317438902df7cf79363563a86c";
 
 async function main() {
