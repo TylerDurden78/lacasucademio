@@ -64,16 +64,25 @@ compartida (validación, tabla, mensajes, JSON-LD). Hay dos entradas:
   JSON-LD) y la que de verdad valida/renderiza.
 - **`page.tsx`** — la de query string (`?entrada=...&salida=...&adultos=...`),
   necesaria porque un `<form method="get">` sin JS siempre produce ese
-  formato. Solo redirige (`redirect()`) a la URL canónica de arriba.
+  formato. Renderiza el mismo contenido directamente (sin redirigir), con
+  `canonical` apuntando a la URL limpia de arriba.
 
-**Por qué:** se comprobó en producción que la herramienta de navegación de
-ChatGPT (sin conector MCP) rechaza abrir URLs con `?` que el propio modelo se
-ha inventado, con el mensaje `"... is not accessible via this tool"` — pero
-abre sin problema una URL sin query string. Antes de este cambio, la única
-URL de disponibilidad llevaba query string y ChatGPT no podía consultarla por
-su cuenta (sí podía si el usuario le pasaba el enlace exacto). Si se añaden
-más parámetros a disponibilidad en el futuro, hacerlo como segmentos de ruta
-opcionales adicionales, no como query string.
+**Por qué existen dos, y por qué la de query string NO redirige:** se
+comprobó en producción, en dos rondas:
+1. La herramienta de navegación de ChatGPT (sin conector MCP) rechaza abrir
+   URLs con `?` que el propio modelo se ha inventado, con el mensaje
+   `"... is not accessible via this tool"` — pero abre sin problema una URL
+   sin query string. De ahí la URL limpia como formato canónico/compartido.
+2. Al hacer que `?query` redirigiera (307) a la URL limpia en vez de
+   renderizar directamente, la misma herramienta dejó de seguir la
+   redirección y se quedó sin contenido. De ahí que `page.tsx` renderice el
+   contenido en el sitio, sin redirigir — las dos URLs son accesibles
+   directamente, y solo el `canonical`/los enlaces que generamos indican cuál
+   es la preferida.
+
+Si se añaden más parámetros a disponibilidad en el futuro, hacerlo como
+segmentos de ruta opcionales adicionales en la URL limpia, no como query
+string — y evitar introducir una redirección entre ambas variantes.
 
 ## Estado de fases
 

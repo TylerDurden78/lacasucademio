@@ -143,14 +143,22 @@ function compararMuestra(
   return errores;
 }
 
-/** El formulario GET (query string) debe redirigir a la URL "limpia". */
-async function comprobarRedireccion(m: Muestra): Promise<string | undefined> {
+/**
+ * La variante con query string (para el formulario GET sin JS) debe devolver
+ * el contenido directamente con 200, sin redirección: se comprobó que alguna
+ * herramienta de navegación de agentes no sigue redirecciones y se queda sin
+ * contenido si esta página solo redirige a la URL "limpia".
+ */
+async function comprobarVarianteQueryString(m: Muestra): Promise<string | undefined> {
   const url = `${SITE_URL}/alojamientos/${SLUG}/disponibilidad?entrada=${m.entrada}&salida=${m.salida}&adultos=${m.adultos}`;
-  const esperado = `/alojamientos/${SLUG}/disponibilidad/${m.entrada}/${m.salida}/${m.adultos}`;
-  const res = await fetch(url);
-  if (!res.ok) return `Redirección ${url} → HTTP ${res.status}`;
-  if (!res.url.endsWith(esperado)) {
-    return `Redirección ${url} llevó a ${res.url}, se esperaba que acabase en ${esperado}`;
+  const res = await fetch(url, { redirect: "manual" });
+  if (res.type === "opaqueredirect" || (res.status >= 300 && res.status < 400)) {
+    return `${url} devolvió una redirección (HTTP ${res.status}) en vez de contenido directo`;
+  }
+  if (!res.ok) return `${url} → HTTP ${res.status}`;
+  const html = await res.text();
+  if (!html.includes("makesOffer")) {
+    return `${url} no incluye el JSON-LD makesOffer esperado`;
   }
   return undefined;
 }
@@ -159,13 +167,13 @@ async function main() {
   console.log(`Verificando ${SITE_URL} ...\n`);
   let totalErrores = 0;
 
-  const errorRedireccion = await comprobarRedireccion(muestras()[0]);
-  if (errorRedireccion) {
+  const errorQueryString = await comprobarVarianteQueryString(muestras()[0]);
+  if (errorQueryString) {
     totalErrores += 1;
-    console.log(`✗ redirección ?query → URL limpia`);
-    console.log(`    - ${errorRedireccion}`);
+    console.log(`✗ variante ?query devuelve contenido directo`);
+    console.log(`    - ${errorQueryString}`);
   } else {
-    console.log(`✓ redirección ?query → URL limpia`);
+    console.log(`✓ variante ?query devuelve contenido directo`);
   }
 
   for (const m of muestras()) {
