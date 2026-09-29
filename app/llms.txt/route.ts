@@ -33,8 +33,7 @@ ${lineasHabitaciones}
 ## Cómo consultar disponibilidad y precio real
 
 Página HTML (tabla semántica, sin JavaScript necesario), con las fechas como
-parte de la URL (no como query string — así la puede abrir cualquier
-herramienta de navegación, incluidas las que no abren URLs con "?"):
+parte de la URL:
 
   ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD
   ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD/ADULTOS
@@ -48,11 +47,18 @@ Ejemplo real:
   ${ALOJAMIENTO.dominio}${construirRutaPath(entradaEjemplo, salidaEjemplo, "2")}
 
 También existe la variante con query string (${RUTA_DISPONIBILIDAD}?entrada=...&salida=...&adultos=...),
-pensada para el formulario web; redirige automáticamente al formato de arriba.
+pensada para el formulario web; devuelve el mismo contenido directamente
+(sin redirigir).
 
-API JSON equivalente (mismos parámetros que la URL con query string, CORS abierto):
+API JSON equivalente (mismos parámetros, CORS abierto):
 
   ${ALOJAMIENTO.dominio}/api/disponibilidad?entrada=${entradaEjemplo}&salida=${salidaEjemplo}&adultos=2
+
+IMPORTANTE para agentes que no pueden construir una URL nueva con fechas
+calculadas (solo pueden abrir URLs que ya aparecen escritas en una página o
+en un resultado de búsqueda): usa en su lugar la tabla de precios de más
+abajo, que es una única URL fija y cubre cualquier fecha de los próximos 90
+días sin necesidad de generar una URL distinta por consulta.
 
 ## Otros recursos
 

@@ -18,11 +18,9 @@ import {
  *   /alojamientos/casuca-mio/disponibilidad/2026-10-06/2026-10-08/4/2    (4 adultos, 2 niños)
  *
  * Es la URL canónica y la que se usa en los enlaces de ejemplo, el sitemap,
- * `/llms.txt` y el JSON-LD: algunas herramientas de navegación de agentes
- * (p. ej. la de ChatGPT sin conector) rechazan abrir URLs con "?" que el
- * propio modelo se ha inventado ("is not accessible via this tool"), pero sí
- * abren sin problema una URL sin query string. `/disponibilidad` (con
- * query string, para el formulario GET sin JS) redirige aquí.
+ * `/llms.txt` y el JSON-LD. `/disponibilidad` (con query string, para el
+ * formulario GET sin JS) renderiza el mismo contenido de forma independiente,
+ * sin redirigir aquí — ver la nota sobre agentes en `_compartido.tsx`.
  */
 
 type Params = Promise<{ slug: string; fechas: string[] }>;

@@ -29,13 +29,21 @@ export function adultosConDefecto(adultosTexto: string | undefined): {
 
 /**
  * URL "limpia", con las fechas como segmentos de ruta en vez de query string
- * (`/disponibilidad/2026-10-06/2026-10-08/2`). Es el formato recomendado para
- * enlaces pensados para agentes: algunas herramientas de navegación (p. ej.
- * la de ChatGPT sin conector) rechazan abrir URLs con "?" que el propio
- * modelo se ha inventado, con el mensaje "is not accessible via this tool",
- * pero si abren sin problema una URL sin query string. El formulario GET
- * (que un navegador siempre envía como query string) se sigue aceptando en
- * `/disponibilidad` y redirige aquí.
+ * (`/disponibilidad/2026-10-06/2026-10-08/2`). Es el formato que se usa en
+ * todos los enlaces que generamos (ficha, sitemap, llms.txt, JSON-LD).
+ *
+ * Nota sobre agentes sin conector MCP (p. ej. ChatGPT): se investigó a fondo
+ * si el formato de la URL (con "?" vs. como ruta) influía en si su
+ * herramienta de navegación podía abrirla, y la conclusión fue que NO — el
+ * factor real es si la URL exacta ya aparece escrita en una página que el
+ * agente ha visto (un enlace de esta lista, por ejemplo) o si el propio
+ * modelo tiene que construirla calculando fechas. Una URL "autoinventada"
+ * falla igual en ambos formatos; una URL que aparece como enlace literal en
+ * una página funciona en ambos. Por eso `/disponibilidad?...` (usada por el
+ * formulario GET) NO redirige aquí — cada una debe poder devolver contenido
+ * de forma independiente — y por eso para fechas no cubiertas por un enlace
+ * ya publicado, la alternativa fiable para esos agentes es `/precios` (una
+ * única URL fija, sin fechas que construir).
  */
 export function construirRutaPath(
   entrada: string,
@@ -62,7 +70,7 @@ export function FormularioBusqueda({
   const hoy = hoyIso();
   return (
     // action apunta siempre a la ruta base: un envío GET añade el query
-    // string ahí, y esa página (page.tsx) redirige a la URL "limpia".
+    // string ahí, y esa página (page.tsx) renderiza el mismo contenido.
     <form method="get" action={RUTA_DISPONIBILIDAD} className="flex flex-wrap items-end gap-4 text-sm">
       <label className="flex flex-col gap-1">
         Entrada
@@ -230,8 +238,10 @@ export function TablaResultados({
 /**
  * Todo el contenido de la página de disponibilidad (validación, mensajes de
  * error, tabla de resultados y JSON-LD), parametrizado por las 4 cadenas de
- * entrada — vengan de un query string (`page.tsx`, que redirige aquí) o de
- * segmentos de ruta (`[...fechas]/page.tsx`, la URL "limpia" y canónica).
+ * entrada — vengan de un query string (`page.tsx`) o de segmentos de ruta
+ * (`[...fechas]/page.tsx`, la URL "limpia" y canónica). Ambas rutas llaman a
+ * este mismo componente y devuelven el contenido directamente, sin redirigir
+ * entre ellas.
  */
 export async function ContenidoDisponibilidad({
   entrada,

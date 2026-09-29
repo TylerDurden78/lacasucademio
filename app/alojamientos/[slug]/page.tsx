@@ -159,13 +159,21 @@ export default async function FichaAlojamiento({
           ))}
         </ul>
         <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-          También disponibles:{" "}
+          <strong>¿La fecha que buscas no está en la lista de arriba?</strong>{" "}
+          Algunas herramientas de navegación no pueden construir por sí solas
+          una URL de disponibilidad para una fecha nueva. En ese caso, consulta
+          en su lugar la{" "}
           <Link className="underline" href={`${RUTA_BASE}/precios`}>
-            tabla de precios a 90 días
-          </Link>{" "}
-          y{" "}
+            tabla de precios de los próximos 90 días
+          </Link>
+          : es una única página fija (sin fechas en la URL) con el precio por
+          noche y la disponibilidad de cada tipo de alojamiento para cualquier
+          día dentro de ese rango.
+        </p>
+        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+          También disponible: API JSON en{" "}
           <Link className="underline" href="/api/disponibilidad">
-            API JSON en /api/disponibilidad
+            /api/disponibilidad
           </Link>
           .
         </p>
