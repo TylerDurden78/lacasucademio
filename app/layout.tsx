@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     description: ALOJAMIENTO.descripcionCorta,
     images: [{ url: IMAGENES.portada }],
   },
+  verification: {
+    google: "F1Wz33feL5cOgW-6p-2H-NtO5F_y3aj9mCRfT7SxZQw",
+  },
 };
 
 const rutaFicha = `/alojamientos/${ALOJAMIENTO.slug}`;
