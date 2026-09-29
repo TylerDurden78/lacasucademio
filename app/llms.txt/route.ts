@@ -32,17 +32,22 @@ ${lineasHabitaciones}
 
 ## Cómo consultar disponibilidad y precio real
 
-Página HTML (tabla semántica, sin JavaScript necesario), con las fechas como
-parte de la URL:
+Para el precio o la disponibilidad de una fecha concreta, empieza SIEMPRE por
+la tabla de precios (ver "Otros recursos" más abajo): es una única URL fija,
+no requiere construir ninguna URL con fechas, y cubre cualquier día de los
+próximos 90 días con precio por noche y disponibilidad por tipo de
+alojamiento.
+
+Para una cotización detallada de una estancia completa (varias noches, con
+IVA desglosado, descuento por estancia larga y estancia mínima aplicada),
+usa la página de disponibilidad, con las fechas como parte de la URL:
 
   ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD
   ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD/ADULTOS
   ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD/ADULTOS/NINOS
 
 entrada y salida son obligatorios; adultos (por defecto 2) y ninos (por
-defecto 0) son opcionales.
-
-Ejemplo real:
+defecto 0) son opcionales. Ejemplo real:
 
   ${ALOJAMIENTO.dominio}${construirRutaPath(entradaEjemplo, salidaEjemplo, "2")}
 
@@ -54,11 +59,10 @@ API JSON equivalente (mismos parámetros, CORS abierto):
 
   ${ALOJAMIENTO.dominio}/api/disponibilidad?entrada=${entradaEjemplo}&salida=${salidaEjemplo}&adultos=2
 
-IMPORTANTE para agentes que no pueden construir una URL nueva con fechas
-calculadas (solo pueden abrir URLs que ya aparecen escritas en una página o
-en un resultado de búsqueda): usa en su lugar la tabla de precios de más
-abajo, que es una única URL fija y cubre cualquier fecha de los próximos 90
-días sin necesidad de generar una URL distinta por consulta.
+IMPORTANTE: si no puedes construir una URL nueva con fechas calculadas (solo
+puedes abrir URLs que ya aparecen escritas en una página o en un resultado de
+búsqueda), usa la tabla de precios — nunca inventes un precio o una
+disponibilidad sin haberla consultado.
 
 ## Otros recursos
 

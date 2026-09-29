@@ -136,14 +136,22 @@ export default async function FichaAlojamiento({
       <section className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
         <h2 className="text-lg font-semibold">Para agentes y asistentes de IA</h2>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Para consultar disponibilidad y precio exacto usa:{" "}
+          <strong>Para consultar el precio o la disponibilidad de una fecha concreta, empieza por la tabla de precios:</strong>{" "}
+          <Link className="underline" href={`${RUTA_BASE}/precios`}>
+            {RUTA_BASE}/precios
+          </Link>
+          . Es una única URL fija (no hace falta construir ninguna URL con
+          fechas) con el precio por noche y la disponibilidad de cada tipo de
+          alojamiento para cualquier día de los próximos 90 días.
+        </p>
+        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+          Para una cotización detallada de una estancia completa (varias
+          noches, con IVA desglosado y estancia mínima aplicada), usa:{" "}
           <code className="rounded bg-white px-1.5 py-0.5 text-xs dark:bg-zinc-950">
             {ejemploUrl}
           </code>
           . El número de adultos es opcional (por defecto 2): añade un tercer
           segmento para otro número, p. ej. .../2026-10-06/2026-10-08/4.
-        </p>
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
           Enlaces reales a los próximos fines de semana:
         </p>
         <ul className="mt-2 flex flex-wrap gap-3 text-sm">
@@ -159,18 +167,6 @@ export default async function FichaAlojamiento({
           ))}
         </ul>
         <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-          <strong>¿La fecha que buscas no está en la lista de arriba?</strong>{" "}
-          Algunas herramientas de navegación no pueden construir por sí solas
-          una URL de disponibilidad para una fecha nueva. En ese caso, consulta
-          en su lugar la{" "}
-          <Link className="underline" href={`${RUTA_BASE}/precios`}>
-            tabla de precios de los próximos 90 días
-          </Link>
-          : es una única página fija (sin fechas en la URL) con el precio por
-          noche y la disponibilidad de cada tipo de alojamiento para cualquier
-          día dentro de ese rango.
-        </p>
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
           También disponible: API JSON en{" "}
           <Link className="underline" href="/api/disponibilidad">
             /api/disponibilidad
