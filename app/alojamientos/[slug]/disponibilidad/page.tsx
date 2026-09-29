@@ -13,11 +13,27 @@ import { JsonLd } from "@/app/_components/JsonLd";
 
 const RUTA_BASE = `/alojamientos/${ALOJAMIENTO.slug}`;
 const RUTA_DISPONIBILIDAD = `${RUTA_BASE}/disponibilidad`;
+const ADULTOS_POR_DEFECTO = 2;
 
 type BusquedaParams = Promise<{ [clave: string]: string | string[] | undefined }>;
 
 function primerValor(valor: string | string[] | undefined): string | undefined {
   return Array.isArray(valor) ? valor[0] : valor;
+}
+
+/**
+ * Si no se indica `adultos` (muy habitual cuando un agente construye la URL
+ * él mismo, sin partir de uno de los enlaces de ejemplo), se asume un valor
+ * razonable en vez de bloquear la consulta con el formulario — así no hace
+ * falta que el agente conozca de antemano ese parámetro para obtener un
+ * precio real.
+ */
+function adultosConDefecto(adultosTexto: string | undefined): {
+  valor: string;
+  asumido: boolean;
+} {
+  if (adultosTexto) return { valor: adultosTexto, asumido: false };
+  return { valor: String(ADULTOS_POR_DEFECTO), asumido: true };
 }
 
 /** URL con query normalizada (orden fijo), para un canonical autorreferente. */
@@ -49,7 +65,7 @@ export async function generateMetadata({
   const sp = await searchParams;
   const entrada = primerValor(sp.entrada);
   const salida = primerValor(sp.salida);
-  const adultos = primerValor(sp.adultos);
+  const { valor: adultos } = adultosConDefecto(primerValor(sp.adultos));
   const ninos = primerValor(sp.ninos);
   const fechas = entrada && salida ? ` ${entrada} → ${salida}` : "";
   const titulo = `Disponibilidad${fechas}`;
@@ -57,8 +73,9 @@ export async function generateMetadata({
   // Cada combinación de fechas es una URL distinta y con contenido propio
   // (precio y disponibilidad reales), pensada para que un agente la visite
   // directamente. El canonical autorreferente (con la misma query,
-  // normalizada) evita que buscadores la traten como duplicado de la versión
-  // sin parámetros en vez de ocultarla.
+  // normalizada, y con `adultos` siempre explícito aunque no se haya pasado)
+  // evita que buscadores la traten como duplicado de la versión sin
+  // parámetros en vez de ocultarla.
   const canonical = construirRutaCanonica(entrada, salida, adultos, ninos);
   return {
     title: titulo,
@@ -268,7 +285,9 @@ export default async function DisponibilidadPage({
   const sp = await searchParams;
   const entrada = primerValor(sp.entrada);
   const salida = primerValor(sp.salida);
-  const adultosTexto = primerValor(sp.adultos);
+  const { valor: adultosTexto, asumido: adultosAsumido } = adultosConDefecto(
+    primerValor(sp.adultos)
+  );
   const ninosTexto = primerValor(sp.ninos) ?? "0";
 
   const encabezado = (
@@ -278,16 +297,18 @@ export default async function DisponibilidadPage({
     </h1>
   );
 
-  if (!entrada || !salida || !adultosTexto) {
+  // entrada y salida no tienen un valor por defecto razonable (son las
+  // fechas que se quieren consultar), así que siguen siendo obligatorias.
+  if (!entrada || !salida) {
     return (
       <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-12">
         {encabezado}
         <MensajeExplicativo
           titulo="Faltan datos para consultar disponibilidad"
-          mensaje="Indica fecha de entrada, fecha de salida y número de adultos (parámetros entrada, salida y adultos, en formato AAAA-MM-DD)."
+          mensaje="Indica fecha de entrada y fecha de salida (parámetros entrada y salida, en formato AAAA-MM-DD)."
           entrada={entrada}
           salida={salida}
-          adultos={adultosTexto}
+          adultos={primerValor(sp.adultos)}
           ninos={ninosTexto}
         />
       </main>
@@ -352,6 +373,13 @@ export default async function DisponibilidadPage({
         })}
       />
       {encabezado}
+      {adultosAsumido && (
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          No se indicó el número de adultos, así que se han asumido{" "}
+          {ADULTOS_POR_DEFECTO}. Añade <code>adultos=N</code> en la URL para un
+          número distinto.
+        </p>
+      )}
       <TablaResultados
         resultados={resultados}
         entrada={entrada}

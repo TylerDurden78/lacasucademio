@@ -139,6 +139,7 @@ export default async function FichaAlojamiento({
           <code className="rounded bg-white px-1.5 py-0.5 text-xs dark:bg-zinc-950">
             {ejemploUrl}
           </code>
+          . Si se omite <code>adultos</code>, se asumen 2.
         </p>
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
           Enlaces reales a los próximos fines de semana:

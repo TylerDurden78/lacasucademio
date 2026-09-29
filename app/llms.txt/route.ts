@@ -35,6 +35,9 @@ Página HTML (tabla semántica, sin JavaScript necesario):
 
   ${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?entrada=AAAA-MM-DD&salida=AAAA-MM-DD&adultos=N&ninos=N
 
+entrada y salida son obligatorios; adultos y ninos son opcionales (por
+defecto, 2 adultos y 0 niños).
+
 Ejemplo real:
 
   ${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?entrada=${entradaEjemplo}&salida=${salidaEjemplo}&adultos=2

@@ -16,14 +16,16 @@ export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
   const entrada = sp.get("entrada");
   const salida = sp.get("salida");
-  const adultosTexto = sp.get("adultos");
+  // Si no se indica adultos, se asume 2 en vez de rechazar la consulta — muy
+  // útil para agentes que construyen la URL sin conocer ese parámetro de
+  // antemano. El valor usado siempre se refleja en "consulta" en la respuesta.
+  const adultosTexto = sp.get("adultos") ?? "2";
   const ninosTexto = sp.get("ninos") ?? "0";
 
-  if (!entrada || !salida || !adultosTexto) {
+  if (!entrada || !salida) {
     return NextResponse.json(
       {
-        error:
-          "Faltan parámetros obligatorios: entrada, salida y adultos (formato AAAA-MM-DD para las fechas).",
+        error: "Faltan parámetros obligatorios: entrada y salida (formato AAAA-MM-DD).",
         ejemplo: `/api/disponibilidad?entrada=2026-11-06&salida=2026-11-08&adultos=2`,
       },
       { status: 400, headers: CABECERAS_CORS }
