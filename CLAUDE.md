@@ -53,6 +53,28 @@ otro sitio.
 - `lib/redis.ts` — construcción del cliente Upstash Redis (`undefined` si no
   hay credenciales), compartida por `bot-log-store.ts` y `rate-limit.ts`.
 
+## URLs de disponibilidad: ruta "limpia", no query string
+
+`app/alojamientos/[slug]/disponibilidad/_compartido.tsx` tiene toda la lógica
+compartida (validación, tabla, mensajes, JSON-LD). Hay dos entradas:
+
+- **`[...fechas]/page.tsx`** — la canónica, con las fechas como segmentos de
+  ruta: `/disponibilidad/AAAA-MM-DD/AAAA-MM-DD[/adultos[/ninos]]`. Es la que
+  se usa en todos los enlaces que generamos (ficha, sitemap, `/llms.txt`,
+  JSON-LD) y la que de verdad valida/renderiza.
+- **`page.tsx`** — la de query string (`?entrada=...&salida=...&adultos=...`),
+  necesaria porque un `<form method="get">` sin JS siempre produce ese
+  formato. Solo redirige (`redirect()`) a la URL canónica de arriba.
+
+**Por qué:** se comprobó en producción que la herramienta de navegación de
+ChatGPT (sin conector MCP) rechaza abrir URLs con `?` que el propio modelo se
+ha inventado, con el mensaje `"... is not accessible via this tool"` — pero
+abre sin problema una URL sin query string. Antes de este cambio, la única
+URL de disponibilidad llevaba query string y ChatGPT no podía consultarla por
+su cuenta (sí podía si el usuario le pasaba el enlace exacto). Si se añaden
+más parámetros a disponibilidad en el futuro, hacerlo como segmentos de ruta
+opcionales adicionales, no como query string.
+
 ## Estado de fases
 
 - [x] **Fase 1** — Motor de disponibilidad y precios (`lib/availability.ts`) + tests
@@ -65,7 +87,7 @@ otro sitio.
       `lib/availability.ts`, sin duplicar reglas de precio.
 - [x] **Fase 3** — SEO y legibilidad para agentes: JSON-LD (`LodgingBusiness` en
       la ficha, `makesOffer` en disponibilidad), metadata/Open Graph completos
-      con canonical (autorreferente con query en disponibilidad), `app/robots.ts`
+      con canonical, `app/robots.ts`
       (permite explícitamente GPTBot, ClaudeBot, PerplexityBot, etc.),
       `app/sitemap.ts` (home, ficha, precios + 8 URLs de ejemplo de
       disponibilidad, ISR diario), `app/llms.txt/route.ts` y notificación a

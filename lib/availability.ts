@@ -53,13 +53,13 @@ const REGEX_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 function parsearFechaUtc(fechaIso: string, etiqueta: string): number {
   if (!REGEX_FECHA.test(fechaIso)) {
     throw new Error(
-      `${etiqueta} inválida: "${fechaIso}". El formato esperado es AAAA-MM-DD.`
+      `${etiqueta} es inválida: "${fechaIso}". El formato esperado es AAAA-MM-DD.`
     );
   }
   const timestamp = Date.parse(`${fechaIso}T00:00:00Z`);
   if (Number.isNaN(timestamp)) {
     throw new Error(
-      `${etiqueta} inválida: "${fechaIso}" no es una fecha real.`
+      `${etiqueta} es inválida: "${fechaIso}" no es una fecha real.`
     );
   }
   return timestamp;

@@ -49,7 +49,10 @@ function muestras(): Muestra[] {
 }
 
 async function extraerOfertasWeb(m: Muestra): Promise<OfertaJsonLd[]> {
-  const url = `${SITE_URL}/alojamientos/${SLUG}/disponibilidad?entrada=${m.entrada}&salida=${m.salida}&adultos=${m.adultos}`;
+  // URL "limpia" (sin query string): es el formato canónico, el que se
+  // comparte en enlaces y el que aceptan las herramientas de navegación más
+  // restrictivas (ver _compartido.tsx).
+  const url = `${SITE_URL}/alojamientos/${SLUG}/disponibilidad/${m.entrada}/${m.salida}/${m.adultos}`;
   const html = await fetch(url).then((r) => {
     if (!r.ok) throw new Error(`Web ${url} → HTTP ${r.status}`);
     return r.text();
@@ -140,9 +143,30 @@ function compararMuestra(
   return errores;
 }
 
+/** El formulario GET (query string) debe redirigir a la URL "limpia". */
+async function comprobarRedireccion(m: Muestra): Promise<string | undefined> {
+  const url = `${SITE_URL}/alojamientos/${SLUG}/disponibilidad?entrada=${m.entrada}&salida=${m.salida}&adultos=${m.adultos}`;
+  const esperado = `/alojamientos/${SLUG}/disponibilidad/${m.entrada}/${m.salida}/${m.adultos}`;
+  const res = await fetch(url);
+  if (!res.ok) return `Redirección ${url} → HTTP ${res.status}`;
+  if (!res.url.endsWith(esperado)) {
+    return `Redirección ${url} llevó a ${res.url}, se esperaba que acabase en ${esperado}`;
+  }
+  return undefined;
+}
+
 async function main() {
   console.log(`Verificando ${SITE_URL} ...\n`);
   let totalErrores = 0;
+
+  const errorRedireccion = await comprobarRedireccion(muestras()[0]);
+  if (errorRedireccion) {
+    totalErrores += 1;
+    console.log(`✗ redirección ?query → URL limpia`);
+    console.log(`    - ${errorRedireccion}`);
+  } else {
+    console.log(`✓ redirección ?query → URL limpia`);
+  }
 
   for (const m of muestras()) {
     const etiqueta = `${m.entrada} → ${m.salida}, ${m.adultos} adulto(s)`;

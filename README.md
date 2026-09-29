@@ -35,7 +35,7 @@ convenciones del repo. Completadas: Fases 1-5.
 - Verificación rápida (HTML crudo, sin JS):
   ```bash
   curl -s https://lacasucademio.vercel.app/alojamientos/casuca-mio | grep LodgingBusiness
-  curl -s "https://lacasucademio.vercel.app/alojamientos/casuca-mio/disponibilidad?entrada=2026-11-06&salida=2026-11-08&adultos=2" | grep -E "makesOffer|€"
+  curl -s "https://lacasucademio.vercel.app/alojamientos/casuca-mio/disponibilidad/2026-11-06/2026-11-08/2" | grep -E "makesOffer|€"
   ```
 
 ## Observabilidad de bots (Fase 4)

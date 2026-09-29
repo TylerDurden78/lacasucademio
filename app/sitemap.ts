@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { ALOJAMIENTO } from "@/lib/config";
 import { proximosFinesDeSemana } from "@/lib/availability";
+import { construirRutaPath } from "./alojamientos/[slug]/disponibilidad/_compartido";
 
 export const revalidate = 86400; // regeneración diaria
 
@@ -27,21 +28,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Solo unas pocas URLs de ejemplo de /disponibilidad (próximos fines de
   // semana): el resto de combinaciones de fechas son válidas y navegables,
-  // pero no tiene sentido listarlas todas en el sitemap.
-  //
-  // Next no escapa el `&` del query string al serializar el XML del
-  // sitemap, así que hay que hacerlo a mano (si no, el `&` sin escapar deja
-  // el XML inválido: "EntityRef: expecting ';'").
+  // pero no tiene sentido listarlas todas en el sitemap. Usan el formato de
+  // ruta "limpio" (sin query string): además de evitar el problema de
+  // escapar "&" en el XML, es el formato que aceptan herramientas de
+  // navegación de agentes más restrictivas (ver _compartido.tsx).
   const urlsDisponibilidad: MetadataRoute.Sitemap = proximosFinesDeSemana(8).map(
-    ({ entrada, salida }) => {
-      const query = new URLSearchParams({ entrada, salida, adultos: "2" }).toString();
-      return {
-        url: `${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?${query}`.replace(/&/g, "&amp;"),
-        lastModified: ahora,
-        changeFrequency: "daily",
-        priority: 0.6,
-      };
-    }
+    ({ entrada, salida }) => ({
+      url: `${ALOJAMIENTO.dominio}${construirRutaPath(entrada, salida, "2")}`,
+      lastModified: ahora,
+      changeFrequency: "daily",
+      priority: 0.6,
+    })
   );
 
   return [...urlsFijas, ...urlsDisponibilidad];

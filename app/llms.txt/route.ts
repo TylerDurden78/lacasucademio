@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ALOJAMIENTO, TIPOS_ALOJAMIENTO } from "@/lib/config";
 import { hoyIso, sumarDiasIso } from "@/lib/availability";
+import { RUTA_DISPONIBILIDAD, construirRutaPath } from "@/app/alojamientos/[slug]/disponibilidad/_compartido";
 
 export const revalidate = 86400; // regeneración diaria
 
@@ -31,18 +32,25 @@ ${lineasHabitaciones}
 
 ## Cómo consultar disponibilidad y precio real
 
-Página HTML (tabla semántica, sin JavaScript necesario):
+Página HTML (tabla semántica, sin JavaScript necesario), con las fechas como
+parte de la URL (no como query string — así la puede abrir cualquier
+herramienta de navegación, incluidas las que no abren URLs con "?"):
 
-  ${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?entrada=AAAA-MM-DD&salida=AAAA-MM-DD&adultos=N&ninos=N
+  ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD
+  ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD/ADULTOS
+  ${ALOJAMIENTO.dominio}${RUTA_DISPONIBILIDAD}/AAAA-MM-DD/AAAA-MM-DD/ADULTOS/NINOS
 
-entrada y salida son obligatorios; adultos y ninos son opcionales (por
-defecto, 2 adultos y 0 niños).
+entrada y salida son obligatorios; adultos (por defecto 2) y ninos (por
+defecto 0) son opcionales.
 
 Ejemplo real:
 
-  ${ALOJAMIENTO.dominio}${RUTA_BASE}/disponibilidad?entrada=${entradaEjemplo}&salida=${salidaEjemplo}&adultos=2
+  ${ALOJAMIENTO.dominio}${construirRutaPath(entradaEjemplo, salidaEjemplo, "2")}
 
-API JSON equivalente (mismos parámetros, CORS abierto):
+También existe la variante con query string (${RUTA_DISPONIBILIDAD}?entrada=...&salida=...&adultos=...),
+pensada para el formulario web; redirige automáticamente al formato de arriba.
+
+API JSON equivalente (mismos parámetros que la URL con query string, CORS abierto):
 
   ${ALOJAMIENTO.dominio}/api/disponibilidad?entrada=${entradaEjemplo}&salida=${salidaEjemplo}&adultos=2
 

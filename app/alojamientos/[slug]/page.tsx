@@ -7,6 +7,7 @@ import { IMAGENES } from "@/lib/images";
 import { jsonLdAlojamiento } from "@/lib/jsonld";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { proximosFinesDeSemana } from "@/lib/availability";
+import { construirRutaPath } from "./disponibilidad/_compartido";
 
 const RUTA_BASE = `/alojamientos/${ALOJAMIENTO.slug}`;
 
@@ -43,7 +44,7 @@ export default async function FichaAlojamiento({
   if (slug !== ALOJAMIENTO.slug) notFound();
 
   const findesDeSemana = proximosFinesDeSemana(4);
-  const ejemploUrl = `${RUTA_BASE}/disponibilidad?entrada=AAAA-MM-DD&salida=AAAA-MM-DD&adultos=N`;
+  const ejemploUrl = `${RUTA_BASE}/disponibilidad/AAAA-MM-DD/AAAA-MM-DD`;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 py-12">
@@ -139,7 +140,8 @@ export default async function FichaAlojamiento({
           <code className="rounded bg-white px-1.5 py-0.5 text-xs dark:bg-zinc-950">
             {ejemploUrl}
           </code>
-          . Si se omite <code>adultos</code>, se asumen 2.
+          . El número de adultos es opcional (por defecto 2): añade un tercer
+          segmento para otro número, p. ej. .../2026-10-06/2026-10-08/4.
         </p>
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
           Enlaces reales a los próximos fines de semana:
@@ -149,7 +151,7 @@ export default async function FichaAlojamiento({
             <li key={entrada}>
               <Link
                 className="text-blue-600 underline dark:text-blue-400"
-                href={`${RUTA_BASE}/disponibilidad?entrada=${entrada}&salida=${salida}&adultos=2`}
+                href={construirRutaPath(entrada, salida, "2")}
               >
                 {entrada} → {salida}
               </Link>
