@@ -139,14 +139,73 @@ implementa `document.modelContext`/`navigator.modelContext`) las descubra sin
 conector remoto — sin instalar nada.
 
 **Importante:** esto es una API de navegador todavía experimental, sin soporte
-extendido hoy. El script comprueba si existe ese objeto y no hace nada si no
-— no afecta al funcionamiento normal del sitio ni sustituye al servidor MCP
-remoto (Fase 5), que sigue siendo la vía fiable mientras esto no sea estándar.
-Es una demo de que el sitio ya está preparado para cuando llegue, no una
-solución para el problema de navegación de agentes sin conector de hoy (ver
-la investigación sobre ChatGPT en `_compartido.tsx` y el historial de commits
-— WebMCP no lo resuelve, porque ese navegador de agente corre server-side,
-no ejecuta JS de la página).
+extendido hoy (no lo implementa ningún navegador de forma estable). El script
+comprueba si existe ese objeto y no hace nada si no — no afecta al
+funcionamiento normal del sitio ni sustituye al servidor MCP remoto (Fase 5),
+que sigue siendo la vía fiable mientras esto no sea estándar. No soluciona el
+problema de navegación de agentes sin conector documentado más abajo (ese
+"navegador" de agente corre server-side y no ejecuta el JS de la página).
+
+**Probado y confirmado funcionando** (2026-09-30) en Chrome 153 con los flags
+`chrome://flags/#enable-webmcp-testing` y
+`chrome://flags/#devtools-webmcp-support` activados: el panel **Application →
+WebMCP** de las DevTools lista las 3 herramientas con su descripción completa,
+y una llamada real desde la consola funciona de principio a fin:
+
+```js
+const tools = await document.modelContext.getTools();
+const tool = tools.find(t => t.name === 'buscar_disponibilidad');
+await document.modelContext.executeTool(tool, JSON.stringify({ entrada: '2026-10-09', salida: '2026-10-11', adultos: 2 }));
+```
+
+Notas de la API real de Chrome (no documentada de forma estable, puede
+cambiar): `executeTool(tool, argumentosJson)` exige el objeto `RegisteredTool`
+tal cual lo devuelve `getTools()` (no vale pasar el nombre como string), y los
+argumentos van como **string JSON** (`JSON.stringify(...)`), no como objeto
+plano — si se pasa un objeto da `UnknownError: Failed to parse input
+arguments`.
+
+## Cierre del proyecto (2026-09-30) — hallazgos de la demo en producción
+
+Con el sitio publicado en `https://lacasucademio.vercel.app` (Vercel, dominio
+gratuito; `ALOJAMIENTO.dominio` en `lib/config.ts` se puede cambiar en una
+línea si se registra `lacasucademio.es` de verdad más adelante — ver
+"Despliegue en Vercel" en el README) y verificado en Google Search Console,
+Bing Webmaster Tools e IndexNow, se probó a fondo con agentes reales cómo
+responden sin conector MCP, dando pie a varios cambios de diseño reflejados
+más arriba (URL limpia, `adultos` por defecto, sin redirección, prioridad a
+`/precios`). Tabla resumen de lo comprobado:
+
+| Agente | Con la URL dada explícitamente | Preguntando "a ciegas" (sin URL, fecha que debe calcular él mismo) |
+|---|---|---|
+| **ChatGPT** (sin conector) | Funciona bien, incluso encadenando preguntas sobre fechas ya publicadas en un enlace | Falla de forma consistente e intermitente — ver más abajo |
+| **Claude** (sin conector) | Funciona bien; sabe leer `/precios` y razonar sobre estancia mínima sin que se le indique | No probado a fondo |
+| **Gemini** | No pudo acceder al dominio en absoluto (probablemente depende de indexación previa en Google, que se acaba de solicitar) | No encuentra el sitio (normal, recién publicado) |
+| **Perplexity** | No evaluado (fuera de alcance, decisión del usuario) | No evaluado |
+
+**Conclusión sobre ChatGPT sin conector:** tras descartar metódicamente el
+formato de URL, las redirecciones y un posible bloqueo de firewall de Vercel
+(comprobado en el panel de Firewall: `Bot Protection: Inactive`, sin reglas
+bloqueando el tráfico de `ChatGPT-User`, que sí llega al servidor), la causa
+queda acotada a la propia herramienta de navegación de ChatGPT: rechaza abrir
+URLs que el modelo construye por sí mismo a partir de un cálculo de fechas
+(cualquier formato), pero sí abre URLs que ya ha "visto" como enlace literal
+en una página o resultado de búsqueda — y ese comportamiento no es
+determinista incluso dentro de la misma sesión. **No es algo que se pueda
+arreglar desde el sitio.** La mitigación aplicada (reordenar `/precios` como
+recurso principal en el texto para agentes) es una mejora razonable, no una
+solución garantizada.
+
+**Para la demo comercial, el argumento queda así:**
+1. Navegación pura (sin instalar nada) funciona bien para contenido estable
+   y para agentes que reciben el enlace — ya es un caso de venta fuerte por sí
+   solo, con matices conocidos y explicables por producto.
+2. El conector MCP remoto (Fase 5) es la vía **siempre fiable**, para quien lo
+   configure — la respuesta cuando un cliente pregunte "¿y si el agente no
+   coopera?".
+3. WebMCP (ver arriba) demuestra que el sitio ya está preparado para el
+   estándar futuro donde ni siquiera hará falta el conector — probado en vivo
+   en Chrome con los flags experimentales.
 
 ## Comandos
 

@@ -88,9 +88,22 @@ En ChatGPT: **Ajustes → Conectores → Avanzado → Modo desarrollador**
 navegador del visitante implementa `document.modelContext` (todavía ninguno
 mainstream lo hace de forma extendida), las mismas 3 herramientas quedarían
 disponibles para un agente integrado en ese navegador **sin conector ni
-instalación**. Hoy no tiene efecto práctico — es una demostración de que el
-sitio ya está preparado para ese estándar cuando llegue, no una solución al
-caso de navegación sin conector (ver más abajo).
+instalación**. Hoy no tiene efecto práctico en el uso normal — es una
+demostración de que el sitio ya está preparado para ese estándar cuando
+llegue, no una solución al caso de navegación sin conector (ver el resumen de
+hallazgos en `CLAUDE.md`, sección "Cierre del proyecto").
+
+**Cómo verlo en vivo** (probado en Chrome 153):
+1. Activa `chrome://flags/#enable-webmcp-testing` y
+   `chrome://flags/#devtools-webmcp-support` → reinicia Chrome.
+2. Abre el sitio, abre DevTools → pestaña **Application → WebMCP**: verás las
+   3 herramientas listadas con su descripción.
+3. Prueba una llamada real desde la consola:
+   ```js
+   const tools = await document.modelContext.getTools();
+   const tool = tools.find(t => t.name === 'buscar_disponibilidad');
+   await document.modelContext.executeTool(tool, JSON.stringify({ entrada: '2026-10-09', salida: '2026-10-11', adultos: 2 }));
+   ```
 
 ### Verificar que web, API y MCP coinciden
 
@@ -123,17 +136,18 @@ la herramienta MCP `buscar_disponibilidad`.
 
 ## Checklist de indexación
 
-- [ ] **Google Search Console**: añadir la propiedad `lacasucademio.vercel.app`,
-      verificar dominio, enviar `https://lacasucademio.vercel.app/sitemap.xml`.
-- [ ] **Bing Webmaster Tools**: añadir el sitio (puede importarse directamente
-      desde Google Search Console) y enviar el mismo sitemap.
-- [ ] **IndexNow**: confirmar que `public/af0f14317438902df7cf79363563a86c.txt`
-      es accesible en `https://lacasucademio.vercel.app/af0f14317438902df7cf79363563a86c.txt`
-      y lanzar `npm run indexnow` tras el primer despliegue.
-- [ ] Comprobar `https://lacasucademio.vercel.app/robots.txt` y `/llms.txt` en
-      producción (deben servir contenido real, no un 404).
+- [x] **Google Search Console**: propiedad `lacasucademio.vercel.app`
+      verificada (etiqueta HTML), sitemap enviado, indexación solicitada para
+      home, ficha y `/precios`.
+- [x] **Bing Webmaster Tools**: sitio importado desde Google Search Console,
+      sitemap y URLs enviadas.
+- [x] **IndexNow**: `public/af0f14317438902df7cf79363563a86c.txt` accesible;
+      `npm run indexnow` lanzado tras cada despliegue relevante.
+- [x] `https://lacasucademio.vercel.app/robots.txt` y `/llms.txt` verificados
+      en producción.
 - [ ] Registrar `/api/mcp` como conector en Claude y en el modo desarrollador
-      de ChatGPT (ver arriba) para la demo en directo.
+      de ChatGPT (ver arriba) para la demo en directo — pendiente de hacerlo
+      tú mismo antes de la reunión con el cliente.
 
 ## Batería de preguntas de prueba
 
