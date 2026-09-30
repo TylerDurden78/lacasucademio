@@ -132,6 +132,14 @@ const mcpHandler = createMcpHandler(
   },
   {
     serverInfo: { name: "casuca-mio-disponibilidad", version: "1.0.0" },
+    // WebMCP (experimental, aún sin soporte extendido en navegadores): publica
+    // estas 3 herramientas para que un agente integrado en el propio
+    // navegador del visitante (cuando esa API exista) las descubra solo con
+    // visitar la página — sin conector remoto. El puente se sirve en
+    // /api/mcp?webmcp-script y se carga en app/layout.tsx.
+    experimental_webMcp: {
+      tools: ["buscar_disponibilidad", "cotizar", "crear_enlace_reserva"],
+    },
   }
 );
 
@@ -152,4 +160,4 @@ async function handler(request: Request): Promise<Response> {
   return mcpHandler(request);
 }
 
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST, handler as HEAD };

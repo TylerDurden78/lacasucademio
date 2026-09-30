@@ -129,6 +129,25 @@ Todas las fases (1-5) están completas. Cambios de alcance mayor sobre lo ya
 construido conviene seguir pactándolos con el usuario antes de tocar el motor
 de precios o las reglas de negocio, dado que así se ha trabajado hasta ahora.
 
+## Extra: WebMCP (experimental, de cara al futuro)
+
+`app/api/mcp/route.ts` también publica un puente WebMCP (`experimental_webMcp`
+de `mcp-handler`), servido en `/api/mcp?webmcp-script` y cargado en
+`app/layout.tsx` vía `next/script`. Publica las mismas 3 herramientas para que
+un agente integrado en el propio navegador del visitante (si ese navegador
+implementa `document.modelContext`/`navigator.modelContext`) las descubra sin
+conector remoto — sin instalar nada.
+
+**Importante:** esto es una API de navegador todavía experimental, sin soporte
+extendido hoy. El script comprueba si existe ese objeto y no hace nada si no
+— no afecta al funcionamiento normal del sitio ni sustituye al servidor MCP
+remoto (Fase 5), que sigue siendo la vía fiable mientras esto no sea estándar.
+Es una demo de que el sitio ya está preparado para cuando llegue, no una
+solución para el problema de navegación de agentes sin conector de hoy (ver
+la investigación sobre ChatGPT en `_compartido.tsx` y el historial de commits
+— WebMCP no lo resuelve, porque ese navegador de agente corre server-side,
+no ejecuta JS de la página).
+
 ## Comandos
 
 ```bash

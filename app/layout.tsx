@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ALOJAMIENTO } from "@/lib/config";
 import { IMAGENES } from "@/lib/images";
@@ -59,6 +60,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <footer className="border-t border-zinc-200 px-6 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
           {ALOJAMIENTO.avisoDemo}
         </footer>
+
+        {/*
+          WebMCP (experimental): sin efecto en navegadores/agentes que no
+          implementen `document.modelContext`/`navigator.modelContext` — el
+          propio script comprueba su existencia y no hace nada si no está.
+          Publica buscar_disponibilidad/cotizar/crear_enlace_reserva para que
+          un agente integrado en el navegador del visitante las descubra solo
+          con cargar la página, sin conector remoto.
+        */}
+        <Script src="/api/mcp?webmcp-script" strategy="afterInteractive" />
       </body>
     </html>
   );

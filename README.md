@@ -81,6 +81,17 @@ En ChatGPT: **Ajustes → Conectores → Avanzado → Modo desarrollador**
 (actívalo si no lo está) → **Añadir conector** → introduce la URL
 `https://lacasucademio.vercel.app/api/mcp` como servidor MCP remoto (Streamable HTTP).
 
+### WebMCP (experimental — demo de cara al futuro)
+
+`/api/mcp` también publica un puente [WebMCP](https://github.com/webmachinelearning/webmcp)
+(`?webmcp-script`, cargado automáticamente en todas las páginas): si el
+navegador del visitante implementa `document.modelContext` (todavía ninguno
+mainstream lo hace de forma extendida), las mismas 3 herramientas quedarían
+disponibles para un agente integrado en ese navegador **sin conector ni
+instalación**. Hoy no tiene efecto práctico — es una demostración de que el
+sitio ya está preparado para ese estándar cuando llegue, no una solución al
+caso de navegación sin conector (ver más abajo).
+
 ### Verificar que web, API y MCP coinciden
 
 ```bash
